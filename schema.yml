@@ -1,0 +1,8 @@
+openapi: 3.0.3
+info:
+  title: API de usuários do SintIA
+  version: 1.0.0
+  description: Por meio desta api é possível fazer a criação, gestão, exclusão de
+    usuários
+paths: {}
+components: {}

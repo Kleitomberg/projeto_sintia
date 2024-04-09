@@ -1,0 +1,155 @@
+[tool.poetry]
+name = "sintia-users"
+version = "0.1.0"
+description = ""
+authors = ["betoxedon <betoxedon@hotmail.com>"]
+readme = "README.md"
+packages = [{ include = "sintia_users" }]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+django = "^5.0.4"
+drf-spectacular = "^0.27.2"
+django-rest-framework = "^0.1.0"
+pillow = "^10.3.0"
+pytest = "^8.1.1"
+pytest-django = "^4.8.0"
+coverage = "^7.4.4"
+taskipy = "^1.12.2"
+ruff = "^0.3.5"
+blue = "^0.9.1"
+bandit = "^1.7.8"
+mypy = "^1.9.0"
+isort = "^5.13.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "magicdocs.settings"
+python_files = [
+    "test_*.py",
+    "*_test.py",
+    "tests/*.py",
+    "test.py",
+    "tests.py",
+    "test_*.py",
+    "tests_*.py",
+    "*_test.py",
+    "*_tests.py",
+]
+filterwarnings = ["ignore::DeprecationWarning"]
+# addopts = "--cov . --cov-report html --doctest-modules"
+addopts = "--doctest-modules --strict-markers"
+
+
+[tool.coverage.run]
+omit = [
+    'venv/*',
+    '**/*test*.py',
+    'manage.py',
+    'magicdocs_backend/*',
+    '**/migrations/*',
+    '**/__init__.py',        # noqa: E999 type: ignore]
+    './settings.py',
+    '**/admin.py',
+    '**/apps.py',
+    '**/asgi.py',
+    '**/wsgi.py',
+    '**/urls.py',
+    'magicdocs/settings.py',
+    'config.py',
+]
+
+[tool.taskipy.tasks]
+test = { cmd = "coverage run -m pytest", help = "runs all unit tests" }
+coverage = { cmd = "coverage html", help = "Generates the html report" }
+run = { cmd = "python manage.py runserver", help = "run project" }
+
+testcov = { cmd = "task test && task coverage", help = "runs all unit tests and coverage" }
+check = "blue --check --diff --color . && isort --check --diff --color . && ruff . && mypy . && bandit -r ."
+format = "blue . && ruff --silent --exit-zero --fix . && isort ."
+checkup = "task check && task format"
+
+[tool.blue]
+line-length = 88
+
+
+[tool.mypy]
+python_version = '3.11'
+exclude = [
+    './__init__.py',
+    './admin.py',
+    './apps.py',
+    './__pycache__/',
+    './settings.py',
+    'manage.py',
+    './urls.py',
+    './wsgi.py',
+    './asgi.py',
+]
+
+ignore_missing_imports = true
+
+disallow_untyped_defs = true
+
+[tool.ruff]
+line-length = 88
+select = [
+    "A",
+    "ARG",
+    "B",
+    "DTZ",
+    "E",
+    "F",
+    "G",
+    "I",
+    "N",
+    "S",
+    "T",
+    "W",
+    "PT",
+    "PL",
+    "TRY",
+    "SIM",
+    "ISC",
+    "COM",
+    "D200",
+    "D400",
+    "PLR2004",
+]
+exclude = ["migrations"]
+
+ignore = [
+    "A003",
+    "Q000",
+    "D212",
+    "TRY003",
+    "PLR0913",
+    "B008",
+    "PLR0911",
+    "PLR0912",
+    "PLR0915",
+]
+target-version = "py310"
+
+[tool.ruff.per-file-ignores]
+"__init__.py" = ["F401"]
+"tests/**" = ["ARG", "S"]
+
+[tool.isort]
+profile = "black"
+
+[tool.logging]
+version = 1
+disable_existing_loggers = true
+
+[tool.logging.loggers.project]
+level = "INFO"
+
+[tool.logging.formatters.formatter]
+class = "logging.Formatter"
+format = "%(asctime)s (%(filename)s:%(lineno)s) - %(funcName)s [%(levelname)8s] - %(message)s"
+datefmt = "%d-%m-%Y"
