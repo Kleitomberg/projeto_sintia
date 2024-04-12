@@ -1,3 +1,5 @@
+from typing import Any
+
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema
 from rest_framework import authentication  # type: ignore
@@ -6,8 +8,16 @@ from rest_framework import permissions  # type: ignore
 from rest_framework import status  # type: ignore
 from rest_framework.exceptions import PermissionDenied  # type: ignore
 from rest_framework.views import APIView, Response  # type: ignore
+from rest_framework.viewsets import ModelViewSet  # type: ignore
 
 from users.serializers import UserSerializer, loginSerializer
+
+
+class UserViewSet(ModelViewSet):
+    serializer_class = UserSerializer
+    queryset = UserSerializer.Meta.model.objects.all()
+    authentication_classes = (authentication.TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
 
 
 class UserCreate(generics.CreateAPIView):
@@ -27,7 +37,7 @@ class LoginView(APIView):
             400: OpenApiTypes.OBJECT,
         },
     )
-    def post(self, request):
+    def post(self, request: Any) -> dict:
         login = loginSerializer(data=request.data)
         if login.is_valid():
             return Response({'Token': login.validated_data.auth_token.key})

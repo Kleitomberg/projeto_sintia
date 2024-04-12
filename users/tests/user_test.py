@@ -18,7 +18,7 @@ class RegisterUserTestCase(APITestCase):
         )
         self.token = Token.objects.create(user=self.user)
 
-    def test_create_user_view(self):
+    def test_create_user_view(self) -> None:
         data = {
             'email': 'test@test.com',
             'password': '8x5j6vh3',

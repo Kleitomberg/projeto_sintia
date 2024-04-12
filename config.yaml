@@ -1,0 +1,18 @@
+settings:
+  secret_key: "^Qi,{%DsLK|9_W8N1.LoOP>q'^{:mbC?~D[CN?wm4F9<0qC%,D&@fm$F0(IqvUY"
+  debug: "0"
+  hosts_CSRF: ""
+  hosts: "" # PRODUÇÃO
+  # hosts:  '127.0.0.1 8668-2804-d49-6621-2a00-c01-4f51-ba-d00b.ngrok-free.app localhost'
+  database_url: postgresql://postgres:postgres@localhost/sintia
+
+chatbot:
+  # url: "https://fastapi.sintia.com.br"
+  url: "https://1d74-167-249-205-235.ngrok-free.app"
+  username: "api_user"
+  # password: "N6V2AKsBa76!qHWARZi*Ha&wMbxSox"
+  password: "N3aN&VQfHSpFdt3ews4F!wPCcUnnLza4@BG7q5kDgT@obsxe%$CB5w2yyVq4"
+
+email:
+  email: "magicdocs.ia@gmail.com"
+  password: "dmsyaogsugjsykea"

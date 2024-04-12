@@ -13,9 +13,9 @@ class UserBaseTest(APITestCase):
             first_name='Roberto',
             last_name='Melo',
         )
-        self.token = Token.objects.create(user=self.user)
+        self.token = Token.objects.get(user=self.user)
 
-    def createUser(self):
+    def createUser(self) -> User:
         return User.objects.create_user(
             email='test@test.com',
             password='1234567890x',

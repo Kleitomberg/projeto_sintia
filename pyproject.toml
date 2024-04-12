@@ -1,10 +1,9 @@
 [tool.poetry]
-name = "sintia-users"
+name = "projeto-sintia"
 version = "0.1.0"
 description = ""
 authors = ["betoxedon <betoxedon@hotmail.com>"]
 readme = "README.md"
-packages = [{ include = "sintia_users" }]
 
 [tool.poetry.dependencies]
 python = "^3.12"
@@ -21,6 +20,10 @@ blue = "^0.9.1"
 bandit = "^1.7.8"
 mypy = "^1.9.0"
 isort = "^5.13.2"
+django-cors-headers = "^4.3.1"
+requests = "^2.31.0"
+types-requests = "^2.31.0.20240406"
+types-pyyaml = "^6.0.12.20240311"
 
 
 [build-system]
@@ -28,7 +31,7 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE = "magicdocs.settings"
+DJANGO_SETTINGS_MODULE = "base.settings"
 python_files = [
     "test_*.py",
     "*_test.py",
