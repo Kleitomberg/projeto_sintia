@@ -26,7 +26,7 @@ def send_email(destino, subject, body): # type: ignore
     s.starttls()
     s.login(msg['From'], password)
     s.sendmail(msg['From'], [msg['To']], msg.as_string().encode('utf-8'))
-    print(f'Email send to {msg['To']}')  # noqa: T201
+    #print(f'Email send to {msg['To']}')  # noqa: T201
 
 
 def greetings_email(destino, senha, nome): # type: ignore

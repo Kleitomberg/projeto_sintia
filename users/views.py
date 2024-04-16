@@ -10,7 +10,12 @@ from rest_framework.exceptions import PermissionDenied  # type: ignore
 from rest_framework.views import APIView, Response  # type: ignore
 from rest_framework.viewsets import ModelViewSet  # type: ignore
 
-from users.serializers import UserSerializer, loginSerializer
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.authtoken.models import Token
+from rest_framework.response import Response
+
+
+from users.serializers import UserSerializer,AuthTokenSerializer
 
 
 class UserViewSet(ModelViewSet):
@@ -26,7 +31,7 @@ class UserCreate(generics.CreateAPIView):
     serializer_class = UserSerializer
 
 
-class LoginView(APIView):
+"""class LoginView(APIView):
     permission_classes = ()
     serializer_class = loginSerializer
 
@@ -45,8 +50,25 @@ class LoginView(APIView):
             return Response(
                 {'error': 'Credenciais inválidas'},
                 status=status.HTTP_400_BAD_REQUEST,
-            )
+            )"""
 
+class AuthToken(ObtainAuthToken):
+    
+    serializer_class = AuthTokenSerializer
+
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data,
+                                           context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        token, created = Token.objects.get_or_create(user=user)
+        
+        return Response({
+            'token': token.key,
+            'user_id': user.pk,
+            'email': user.email
+        })
 
 class UserListView(generics.ListAPIView):
     serializer_class = UserSerializer

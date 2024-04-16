@@ -14,8 +14,13 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
+from django.conf import settings
+
 from django.contrib import admin  # type: ignore
 from django.urls import include, path  # type: ignore
+from django.conf.urls.static import static
+
 from drf_spectacular.views import (
     SpectacularAPIView,
     SpectacularRedocView,
@@ -29,3 +34,7 @@ urlpatterns = [
     path('docs/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
     path('api/', include('base.api')),
 ]
+
+# Adicione esta linha para servir arquivos estáticos e de mídia durante o desenvolvimento
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

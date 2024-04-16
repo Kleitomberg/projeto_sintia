@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from customizations.serializers import SidesSerializer,FontSerializer
 
 from chatbots.models import (
     ApiKey,
@@ -69,6 +70,8 @@ class ApiKeySerializer(serializers.ModelSerializer):
 
 
 class ChatBotSerializer(serializers.ModelSerializer):
+    
+    
     class Meta:
         model = ChatBot
         fields = (
@@ -97,6 +100,7 @@ class ChatBotSerializer(serializers.ModelSerializer):
         extra_kwargs = {"material_core": {"write_only": True}}
 
     def create(self, validated_data):  # type: ignore
+        
         instance = super().create(validated_data)
         instance.user = self.context["request"].user
         instance.search = SearchType.objects.get(value="brave")
@@ -114,10 +118,10 @@ class ScalationsSerializer(serializers.ModelSerializer):
 class ChatBotDetailSerialer(serializers.Serializer):
     id = serializers.SerializerMethodField()
     name = serializers.SerializerMethodField()
-    type = serializers.SerializerMethodField()
-    model = serializers.SerializerMethodField()
-    tone = serializers.SerializerMethodField()
-    voice = serializers.SerializerMethodField()
+    type = BotTypeSerializer()
+    model = ModelTypeSerializer()
+    tone = ToneTypeSerializer()
+    voice = VoiceTypeSerializer()
     prompt = serializers.SerializerMethodField()
     language = serializers.SerializerMethodField()
     temperature = serializers.SerializerMethodField()
@@ -130,8 +134,8 @@ class ChatBotDetailSerialer(serializers.Serializer):
     published = serializers.SerializerMethodField()
     active = serializers.SerializerMethodField()
     color = serializers.SerializerMethodField()
-    font = serializers.SerializerMethodField()
-    side = serializers.SerializerMethodField()
+    font = FontSerializer()
+    side = SidesSerializer()
 
     def get_private(self, obj):  # type: ignore
         return obj.is_private
@@ -173,7 +177,9 @@ class ChatBotDetailSerialer(serializers.Serializer):
         return obj.temperature
 
     def get_material_core(self, obj):  # type: ignore
-        return obj.material_core
+        if obj.material_core:
+            lista = str(obj.material_core).split(',')          
+            return lista    
 
     def get_solar_url_host(self, obj):  # type: ignore
         return obj.solar_url_host
@@ -185,13 +191,14 @@ class ChatBotDetailSerialer(serializers.Serializer):
         return obj.audio_response
 
     def get_image_file(self, obj):  # type: ignore
+        request = self.context["request"]
         if obj.image_file:
-            return obj.image_file.url
-        return None
+           return request.build_absolute_uri(obj.image_file.url)           
+        return None 
 
     def get_color(self, obj):  # type: ignore
         if obj.color:
-            return f"background-color: {obj.color}"
+            return f"{obj.color}"
         return None
 
     def get_font(self, obj):  # type: ignore
@@ -201,7 +208,7 @@ class ChatBotDetailSerialer(serializers.Serializer):
 
     def get_side(self, obj):  # type: ignore
         if obj.side:
-            return obj.side.property_value
+            return obj.side.id
         return None
 
     class Meta:

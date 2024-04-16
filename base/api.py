@@ -1,5 +1,6 @@
 from django.urls import include, path  # type: ignore
 from rest_framework.authtoken.views import obtain_auth_token  # type: ignore
+from users.views import AuthToken
 from rest_framework.routers import DefaultRouter  # type: ignore
 
 from bot_messages import viewsets as MessagesViewSets
@@ -13,4 +14,4 @@ router.register(r'chatbots', ChatbotViewsets.ChatBotViewSet, basename='chatbots'
 router.register(r'messages', MessagesViewSets.MessageViewSet, basename='messages')
 router.register(r'sessions', MessagesViewSets.SessionViewSet, basename='sessions')
 
-urlpatterns = [path('', include(router.urls)), path('login/', obtain_auth_token)]
+urlpatterns = [path('', include(router.urls)), path('login/', AuthToken.as_view())]

@@ -7,7 +7,7 @@ from rest_framework.response import Response
 
 from base.permissions import OwnProfilePermission
 from chatbots import serializers
-from chatbots.models import ChatBot
+from chatbots.models import ChatBot,VoiceType
 
 from customizations import serializers as custom_serializers
 from customizations import models as custom_models
@@ -21,7 +21,25 @@ class ChatBotViewSet(viewsets.ModelViewSet):
     def get_queryset(self):  # type: ignore
         user = self.request.user
         return self.queryset.filter(user=user)
+    
+    def perform_create(self, serializer):       
+        voice = self.request.data.get("voice", None)  # read data from request
+        side  = self.request.data.get("side", None)
+        font =self.request.data.get("font", None)
+        
+        if not voice:
+            voice = VoiceType.objects.get(name='Nova')
+            serializer.save(voice=voice)
 
+        if not side:
+            side = custom_models.screenSides.objects.get(name='Direita')
+            serializer.save(side=side)
+            
+        if not font:
+            font = custom_models.fontFamilies.objects.get(name='Sans')
+            serializer.save(font=font)
+            
+    
     def update(self, request: dict, *args: Any, **kwargs: Any) -> Any:
         if (
             request.user
@@ -49,15 +67,15 @@ class ChatBotViewSet(viewsets.ModelViewSet):
 
         page = self.paginate_queryset(queryset)
         if page is not None:
-            serializer = serializers.ChatBotDetailSerialer(page, many=True)
+            serializer = serializers.ChatBotDetailSerialer(page, many=True, context={'request': request})
             return self.get_paginated_response(serializer.data)
 
-        serializer = serializers.ChatBotDetailSerialer(queryset, many=True)
+        serializer = serializers.ChatBotDetailSerialer(queryset, many=True, context={'request': request})
         return Response(serializer.data)
 
     def retrieve(self, request, *args, **kwargs):  # type: ignore
         instance = self.get_object()
-        serializer = serializers.ChatBotDetailSerialer(instance)
+        serializer = serializers.ChatBotDetailSerialer(instance,context={'request': request})
         return Response(serializer.data)
 
     @action(detail=False, methods=["get"])
