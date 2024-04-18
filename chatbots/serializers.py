@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from customizations.serializers import SidesSerializer,FontSerializer
-
+from users.serializers import UserSerializer
 from chatbots.models import (
     ApiKey,
     BotType,
@@ -136,6 +136,8 @@ class ChatBotDetailSerialer(serializers.Serializer):
     color = serializers.SerializerMethodField()
     font = FontSerializer()
     side = SidesSerializer()
+    user = UserSerializer()
+
 
     def get_private(self, obj):  # type: ignore
         return obj.is_private

@@ -2,8 +2,9 @@ from typing import Any
 
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
+from django.core.exceptions import ObjectDoesNotExist
 
 from base.permissions import OwnProfilePermission
 from chatbots import serializers
@@ -11,16 +12,20 @@ from chatbots.models import ChatBot,VoiceType
 
 from customizations import serializers as custom_serializers
 from customizations import models as custom_models
-
+from users.models import User
 
 class ChatBotViewSet(viewsets.ModelViewSet):
     queryset = ChatBot.objects.all()
     serializer_class = serializers.ChatBotSerializer
     permission_classes = [IsAuthenticated, OwnProfilePermission]
 
+    
     def get_queryset(self):  # type: ignore
-        user = self.request.user
-        return self.queryset.filter(user=user)
+        if self.action == 'list':
+            user = self.request.user
+            return self.queryset.filter(user=user)
+        
+        return self.queryset
     
     def perform_create(self, serializer):       
         voice = self.request.data.get("voice", None)  # read data from request
@@ -52,6 +57,7 @@ class ChatBotViewSet(viewsets.ModelViewSet):
             return Response(status=status.HTTP_403_FORBIDDEN)
 
     def destroy(self, request: dict, *args: Any, **kwargs: Any) -> Any:
+        
         if (
             request.user
             == serializers.ChatBotSerializer.Meta.model.objects.get(
@@ -129,3 +135,25 @@ class ChatBotViewSet(viewsets.ModelViewSet):
             "colors": colors,
         }
         return Response(data)
+
+    @action(detail=True, methods=["get"], permission_classes=[AllowAny], url_path='chatbotByid' )
+    def get_chatbotByid(self, request, pk=None):
+        
+    
+        instance = self.get_object()    
+  
+        userId = request.query_params.get('userId')       
+
+        if not userId:        
+            return Response({"error": "Você não tem autorização"}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        try:
+            user = User.objects.get(id=userId)
+        except ObjectDoesNotExist:
+            return Response({"error": "Usuario não existe"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        if instance.user.id != user.id:
+            return Response({"error": "Você não tem autorização"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        serializer = serializers.ChatBotDetailSerialer(instance, context={'request': request})
+        return Response(serializer.data)

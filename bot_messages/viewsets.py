@@ -19,7 +19,7 @@ class MessageViewSet(viewsets.ModelViewSet):
         queryset = Message.objects.filter(session=session)
         conversations = session.bot.get_session_messages(queryset)
         scalations = session.bot.get_scalations()
-        user = request.user
+        user = session.bot.user
         cost = session.bot.model.credits_cost
         if user.credits < cost:
             email.no_credits_email(user.email, f"{user.first_name} {user.last_name}")
@@ -53,10 +53,18 @@ class SessionViewSet(viewsets.ModelViewSet):
     permission_classes = [PostCreateOrAuthenticated, OwnProfilePermission]
 
     def create(self, request, *args, **kwargs):  # type: ignore
-
+       
+        
+        bot = request.data.get('bot',None)
+      
+        if not bot:
+            return Response({"error": "Por favor informe um bot válido"}, status=status.HTTP_404_NOT_FOUND)
+        
+          
         data = {
-            "bot": request.query_params.get("bot", ""),
-        }
+            "bot": bot,
+        }        
+        
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
